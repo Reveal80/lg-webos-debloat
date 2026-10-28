@@ -63,7 +63,7 @@ apps), Settings, inputs and HDMI, channel setup, software update and the Homebre
 - **[cleanyourtv-WebOS](https://github.com/lasharor/cleanyourtv-WebOS)**: a clean, customisable Home launcher for
   rooted webOS TVs (app dock, wallpapers, themes). This project cleans what is behind it (promotions, ACR,
   preloaded apps, the system apps on LG's own Home); that one replaces the Home screen itself. They do not
-  overlap and can be used together: the TV in the screenshot above runs both.
+  overlap and can be used together.
 - **[webosbrew](https://www.webosbrew.org/)**: the Homebrew Channel, root guides and the community app catalogue.
 
 ## What you need
