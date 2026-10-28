@@ -58,6 +58,14 @@ Every file and setting is backed up to `/var/lib/webos-clean/` on the TV **the f
 Some apps can never be hidden or taken out of memory: Live TV, Home, the LG Content Store (you need it to update
 apps), Settings, inputs and HDMI, channel setup, software update and the Homebrew Channel. The script refuses them.
 
+## Works well with
+
+- **[cleanyourtv-WebOS](https://github.com/lasharor/cleanyourtv-WebOS)**: a clean, customisable Home launcher for
+  rooted webOS TVs (app dock, wallpapers, themes). This project cleans what is behind it (promotions, ACR,
+  preloaded apps, the system apps on LG's own Home); that one replaces the Home screen itself. They do not
+  overlap and can be used together: the TV in the screenshot above runs both.
+- **[webosbrew](https://www.webosbrew.org/)**: the Homebrew Channel, root guides and the community app catalogue.
+
 ## What you need
 
 - An LG TV on **webOS 22** (webOS 7.x, 2022 models; firmware `04.xx`). Other versions may work in part:
