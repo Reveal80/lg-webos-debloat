@@ -1,0 +1,10 @@
+# LG 65QNED866QA (QNED86, 2022), webOS 22 (7.6.0), firmware 04.60.91, Spain. Tested 2026-10-28.
+# Hidden from Home with: tools/lgclean <tv-ip> hide-apps examples/lg-65qned866qa-webos22/hide.txt  (then reboot)
+# Undo: tools/lgclean <tv-ip> show-apps  (then reboot)
+com.webos.app.sportsteamsettings # Sports alerts
+com.webos.app.homeconnect        # Home Dashboard (ThinQ / smart home)
+com.webos.app.igallery           # Art Gallery
+amazon.alexa.view                # Amazon Alexa (Prime Video is "amazon" and is not touched)
+com.webos.app.lgchannels         # LG Channels, free ad-supported channels; runs from an updated copy, gets visible:false
+com.webos.app.browser            # Web Browser: remove this line if you use it
+com.webos.app.mediadiscovery     # Media Player (USB / DLNA): remove this line if you play files from USB

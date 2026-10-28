@@ -1,0 +1,6 @@
+# Apps LG keeps loaded in memory after boot although they are never opened. Back to normal: preload-on
+com.webos.app.lgchannels # LG Channels
+com.webos.app.browser    # Web Browser
+amazon.alexapr           # Alexa
+google.assistant         # Google Assistant: remove if you use voice
+com.webos.app.voice      # LG voice: remove if you use voice
