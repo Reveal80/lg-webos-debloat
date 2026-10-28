@@ -38,7 +38,7 @@ apps), Settings, inputs and HDMI, channel setup, software update and the Homebre
 ## Quick start
 
 ```sh
-git clone https://github.com/<you>/<this-repo>.git && cd <this-repo>
+git clone https://github.com/Reveal80/lg-webos-debloat.git && cd lg-webos-debloat
 tools/lgclean <tv-ip> status                       # look first
 tools/lgclean <tv-ip> -n apply                     # dry run: prints what would change
 tools/lgclean <tv-ip> promos-off
