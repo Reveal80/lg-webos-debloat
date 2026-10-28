@@ -35,7 +35,9 @@ Steps
    again to confirm the hidden apps are gone from Home.
 7. Ads on the network: if I use Pi-hole or AdGuard Home, explain docs/DNS.md and offer to set it up for the TV's
    IP only.
-8. Finish with a short summary of what changed and the one command that undoes it all:
+8. Show me `tools/lgtv.py` (screenshot, messages, remote keys after `pair`, channels, volume, wake/off) and, if I
+   want reminders on screen, help me put `lgtv.py <ip> toast "..."` in cron.
+9. Finish with a short summary of what changed and the one command that undoes it all:
    `tools/lgclean <ip> restore` followed by a reboot.
 
 If I want to share my lists, prepare `examples/<brand-model-webosNN>/` with `hide.txt`, `preload.txt` and a

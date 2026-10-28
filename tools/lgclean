@@ -6,23 +6,27 @@
 #   tools/lgclean 192.168.0.50 status
 #   tools/lgclean 192.168.0.50 -n hide-apps examples/lg-65qned866qa-webos22/hide.txt   # dry run first
 #   tools/lgclean 192.168.0.50 hide-apps examples/lg-65qned866qa-webos22/hide.txt
+#   tools/lgclean 192.168.0.50 show-app com.webos.app.browser                          # bring one back
 #   tools/lgclean 192.168.0.50 restore
 #
 # Needs SSH enabled in the Homebrew Channel (root). Set LGCLEAN_SSH="-i ~/.ssh/my_key" for extra ssh options.
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
-[ $# -ge 2 ] || { sed -n '3,11p' "$0" | sed 's/^# \{0,1\}//'; exit 2; }
+[ $# -ge 2 ] || { sed -n '3,12p' "$0" | sed 's/^# \{0,1\}//'; exit 2; }
 tv=$1; shift
 dry=(); [ "${1:-}" = "-n" ] && { dry=(-n); shift; }
 cmd=$1; list=${2:-}
-case "$cmd" in status|promos-off|promos-on|preload-off|preload-on|hide-apps|show-apps|apply|restore) ;;
+case "$cmd" in status|promos-off|promos-on|preload-off|preload-on|hide-apps|show-apps|show-app|apply|restore) ;;
     *) echo "unknown command: $cmd" >&2; exit 2 ;; esac
 ssh_opts=(-o ConnectTimeout=8 -o ServerAliveInterval=5 -o ServerAliveCountMax=3 ${LGCLEAN_SSH:-})
 
 ssh "${ssh_opts[@]}" "root@$tv" 'mkdir -p /tmp/webos-clean'
 scp -q "${ssh_opts[@]}" "$here/webos-clean.sh" "root@$tv:/tmp/webos-clean/webos-clean.sh"
 remote_list=""
-if [ -n "$list" ]; then
+if [ "$cmd" = show-app ]; then   # an app id, not a file
+    [[ "$list" =~ ^[A-Za-z0-9._-]+$ ]] || { echo "usage: lgclean <tv-ip> show-app <app-id>" >&2; exit 2; }
+    remote_list=$list
+elif [ -n "$list" ]; then
     [ -r "$list" ] || { echo "cannot read $list" >&2; exit 1; }
     scp -q "${ssh_opts[@]}" "$list" "root@$tv:/tmp/webos-clean/list.txt"
     remote_list=/tmp/webos-clean/list.txt

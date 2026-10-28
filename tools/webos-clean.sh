@@ -7,6 +7,7 @@
 #   promos-off | promos-on  home/live promotions, sports alerts, ACR (livePlus), recommendations
 #   preload-off | preload-on  stop LG keeping unused apps loaded in memory (takes effect on next boot)
 #   hide-apps | show-apps   hide built-in system apps from Home (takes effect on next reboot)
+#   show-app <id>           bring back one hidden app, leave the rest hidden (next reboot)
 #   apply                   promos-off + preload-off + hide-apps
 #   restore                 promos-on + preload-on + show-apps
 #
@@ -163,8 +164,21 @@ show_apps() {
     say "  takes effect after a reboot (run: reboot)"
 }
 
-case "$CMD" in status|promos-off|promos-on|preload-off|preload-on|hide-apps|show-apps|apply|restore) ;;
-    *) sed -n '3,17p' "$0" | sed 's/^# \{0,1\}//'; exit 2 ;; esac
+case "$CMD" in status|promos-off|promos-on|preload-off|preload-on|hide-apps|show-apps|show-app|apply|restore) ;;
+    *) sed -n '3,18p' "$0" | sed 's/^# \{0,1\}//'; exit 2 ;; esac
+show_app() {
+    id=$LIST
+    valid_id "$id" || die "give one app id: show-app <id>"
+    say "== Show $id"
+    if grep -q "\"$id\"" "$DELETED" 2>/dev/null; then
+        re=$(printf '%s' "$id" | sed 's/\./\\./g')
+        do_ sed -i -e "s/\"$re\",//" -e "s/,\"$re\"\]/]/" -e "s/\[\"$re\"\]/[]/" "$DELETED"
+        say "  removed from $DELETED"
+    else say "  not in $DELETED"; fi
+    if [ -e "$D/appinfo-$id.json" ]; then do_ cp "$D/appinfo-$id.json" "$UPDATED/$id/appinfo.json"; say "  appinfo.json restored"; fi
+    say "  takes effect after a reboot (run: reboot)"
+}
+
 [ "$(id -u)" = 0 ] || die "run as root (rooted TV with Homebrew Channel)"
 command -v luna-send >/dev/null || die "luna-send not found: this does not look like webOS"
 case "$CMD" in
@@ -175,7 +189,7 @@ case "$CMD" in
     preload-on) preload_on ;;
     hide-apps) hide_apps ;;
     show-apps) show_apps ;;
+    show-app) show_app ;;
     apply) LIST=; promos_off; preload_off; hide_apps ;;
     restore) promos_on; preload_on; show_apps ;;
-    *) sed -n '3,17p' "$0" | sed 's/^# \{0,1\}//'; exit 2 ;;
 esac

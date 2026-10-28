@@ -19,6 +19,8 @@ Follow [PROMPT.md](PROMPT.md) on the real TV. The rules that are not negotiable:
 
 - `tools/webos-clean.sh` must run on the TV's BusyBox `ash`: no bash features, no Python, no `jq`. Check with
   `sh -n` and, if you have it, `shellcheck -s sh`.
+- `tools/lgtv.py` runs on the user's computer: Python 3.8+, standard library only, no new dependencies.
+  `tools/ssap-button.js` runs on the TV's own `node` and may only use the `ws` module bundled with webOS.
 - Every new change must back up what it changes once to `/var/lib/webos-clean/` and be undone by `restore`.
 - New models go in `examples/<brand-model-webosNN>/` with `README.md`, `hide.txt` and `preload.txt`.
 - Keep the README tables in step with the commands.

@@ -14,6 +14,7 @@ over ADB but cannot reach LG's webOS. This is an independent project, not affili
 | `promos-off` | Sets to `off`: home promotions, live TV promotions, promotional videos, the promotion streamer, sports alerts, **Live Plus (ACR)** and content recommendations. Only keys your TV reports are written. | At once |
 | `preload-off` | Stops LG keeping apps such as LG Channels, the browser and Alexa loaded in memory after boot, by setting them to `false` in `/var/preferences/webos-preload-manager-conf.json`. They still open, a little slower the first time. | Next cold boot |
 | `hide-apps` | Hides built-in system apps from Home by adding them to webOS's own list of removed system apps (`deletedSystemAppList.json`, where LG keeps the preinstalled apps you delete). System apps that LG updated run from a copy in `/media/system/apps`, which that list does not reach: those get `"visible":false` in their `appinfo.json`. While hidden, an app cannot be opened. | After a reboot |
+| `show-app <id>` | Brings back one hidden app and leaves the others hidden. | After a reboot |
 | `apply` | All three, with the default lists. | |
 | `restore` | `promos-on`, `preload-on` and `show-apps`: everything back as it was before the first run. | After a reboot |
 | `status` | Shows all of the above. Changes nothing. | |
@@ -33,7 +34,8 @@ apps), Settings, inputs and HDMI, channel setup, software update and the Homebre
   [DejaVuln](https://github.com/throwaway96/dejavuln-autoroot) and the
   [crashd method](https://gist.github.com/Maximetinu/bc454b92e92a50bf0b21d1b849c46b69). **Do not update your
   TV's firmware**: LG patches every root method, and the Homebrew Channel blocks updates for that reason.
-- A computer on the same network with `ssh`, `scp` and `bash` (Linux, macOS, or WSL on Windows).
+- A computer on the same network with `ssh`, `scp` and `bash` (Linux, macOS, or WSL on Windows), and Python 3.8+
+  for `lgtv.py`.
 
 ## Quick start
 
@@ -57,6 +59,46 @@ Extra ssh options go in `LGCLEAN_SSH`, for example `LGCLEAN_SSH="-i ~/.ssh/lgtv"
 
 Paste [`PROMPT.md`](PROMPT.md) into Claude Code, Codex, Gemini CLI or another assistant with shell access, on a
 computer on the same network as the TV. It checks your TV, asks which apps you use and builds your own lists.
+
+## Remote control from your computer: `lgtv.py`
+
+`tools/lgtv.py` (Python, standard library only) gives you the TV's everyday functions from a terminal or a
+script, over the same SSH connection:
+
+```sh
+tools/lgtv.py <tv-ip> status                     # power, app on screen, volume, model, MAC
+tools/lgtv.py <tv-ip> screenshot shot.jpg        # what is on screen, menus and Live TV included
+tools/lgtv.py <tv-ip> toast "Dinner is ready"    # message in the corner, goes away by itself
+tools/lgtv.py <tv-ip> alert "Bedtime" --title Home   # message box that stays until OK is pressed
+tools/lgtv.py <tv-ip> pair                       # once: accept the prompt on the TV, then:
+tools/lgtv.py <tv-ip> key down down ok back      # remote buttons: arrows, ok, back, home, menu, colours...
+tools/lgtv.py <tv-ip> channels                   # numbers, names and ids
+tools/lgtv.py <tv-ip> channel 5                  # by number or by channel id
+tools/lgtv.py <tv-ip> app netflix | input 2 | live
+tools/lgtv.py <tv-ip> volume 15 | mute on
+tools/lgtv.py <tv-ip> picture backlight=30 pictureMode=cinema
+tools/lgtv.py <tv-ip> off                        # and to turn it on again:
+tools/lgtv.py <tv-ip> wake --mac <MAC from status>
+```
+
+`tools/lgtv.py -h` lists everything. A few things it took a while to find out:
+
+- **Arrow keys** cannot be sent with `luna-send` on webOS. `key` sends them through LG's own remote API (SSAP,
+  `getPointerInputSocket`), using a small script that runs on the TV with the TV's own `node`
+  ([`tools/ssap-button.js`](tools/ssap-button.js)). That API wants pairing once; the key is kept in
+  `~/.config/lgtv/`.
+- **Changing channel** with `launch` and a `channelId` does nothing when Live TV is already on screen; `channel`
+  uses `openChannel`, which always retunes.
+- **Turning off** over SSH used to hang for minutes, because the TV drops off the network without closing the
+  connection. `off` starts the power-off detached on the TV (`setsid -f`) and returns at once.
+- **Wake-on-LAN** needs *Turn on via Wi-Fi* (or LAN) enabled in the TV's settings.
+- **Scheduled messages** need nothing special: put `toast` or `alert` in cron.
+  `0 21 * * 1-5 /path/to/tools/lgtv.py 192.168.0.50 toast "Bedtime"` shows it at 21:00 on weekdays. If the TV is off,
+  the message is lost.
+- **Screenshots without Android's limits.** On Android TV, a screenshot of Live TV, an HDMI input or a DRM app
+  comes out black, because Android refuses to capture protected video. On webOS, `screenshot` asks LG's capture
+  service as root for the whole display (`executeOneShot`, method `DISPLAY`), so **Live TV comes out as you see
+  it** (tested). HDMI inputs and DRM apps such as Netflix are not tested yet: reports welcome.
 
 ## Lists
 
