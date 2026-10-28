@@ -7,6 +7,39 @@ deleted, the read-only system partition is never touched, and one command puts e
 Inspired by [cleanyourtv](https://github.com/Gathin23/cleanyourtv), which does this for Android TV and Google TV
 over ADB but cannot reach LG's webOS. This is an independent project, not affiliated with it or with LG.
 
+## What it looks like
+
+The Home screen of the tested TV after `hide-apps` (22 tiles down to 15: your apps and the Content Store), taken
+with `tools/lgtv.py screenshot`:
+
+![Home screen of an LG webOS 22 TV after hide-apps: only the user's apps and the LG Content Store remain in the app bar](docs/img/home-after.jpg)
+
+```text
+$ tools/lgclean 192.168.0.50 status
+== webOS
+  7.6.0 (firmware 04.60.91), model 65QNED866QA
+== Promotion, ACR and recommendation settings (off is what you want)
+  general: {"sportsAlarm":"off","homePromotion":"off"}
+  option: {"livePromotion":"off","livePlus":"off","promotionStreamer":"off","webOSPromotionVideo":"off"}
+  other: {"contentRecommendation":"off"}
+== Preload (false = not kept in memory)
+  com.webos.app.lgchannels:false
+  com.webos.app.browser:false
+  amazon.alexapr:false
+  ...
+== Hidden system apps
+  {"deletedList":["com.webos.app.igallery","com.webos.app.sportsteamsettings","com.webos.app.homeconnect",...]}
+  visible:false  com.webos.app.lgchannels
+  15 tiles on Home right now
+
+$ tools/lgtv.py 192.168.0.50 status
+power:   Active
+on screen: com.webos.app.home
+volume:  13
+model:   65QNED866QA  webOS 7.6.0  firmware 04.60.91
+MAC:     xx:xx:xx:xx:xx:xx  (for: lgtv.py <ip> wake --mac xx:xx:xx:xx:xx:xx)
+```
+
 ## What it changes
 
 | Command | What it does | Takes effect |
@@ -112,6 +145,13 @@ and LG Channels, and `preload-off` handles LG Channels and Alexa.
 The TV still shows ads that come from LG's servers. Block those with DNS: [docs/DNS.md](docs/DNS.md) explains how
 to use [lg-tv-ad-block](https://github.com/hugobatista/lg-tv-ad-block) in Pi-hole **for the TV only**, because the
 list also blocks domains other devices in your home need.
+
+## Known limits
+
+- The **"TV features" row** of the webOS 22 Home screen (User Guide, TV Guide, Home Dashboard...) is drawn by the
+  Home app itself. Hiding Home Dashboard removes its app tile, but its card in that row stays, as in the screenshot
+  above.
+- Hidden apps cannot be opened at all until you bring them back with `show-app` or `show-apps`.
 
 ## Things learned the hard way
 
